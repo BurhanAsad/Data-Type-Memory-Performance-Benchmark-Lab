@@ -1,0 +1,103 @@
+
+
+import numpy as np
+import time
+import matplotlib.pyplot as plt
+
+# 1. Create arrays of different data types
+size = 1_000_000
+
+data_types = [
+    np.int8,
+    np.int16,
+    np.int32,
+    np.int64,
+    np.float16,
+    np.float32,
+    np.float64
+]
+
+names = []
+memory = []
+sum_times = []
+multiply_times = []
+
+print("DATA TYPE MEMORY AND PERFORMANCE BENCHMARK\n")
+
+# 2. Check memory and execution time
+for dtype in data_types:
+
+    arr = np.ones(size, dtype=dtype)
+
+    # Memory information
+    memory_mb = arr.nbytes / (1024 * 1024)
+
+    # Measure sum operation
+    start = time.perf_counter()
+    for i in range(5):
+        total = np.sum(arr)
+    sum_time = (time.perf_counter() - start) / 5
+
+    # Measure multiplication operation
+    start = time.perf_counter()
+    for i in range(5):
+        result = arr * 2
+    multiply_time = (time.perf_counter() - start) / 5
+
+    names.append(np.dtype(dtype).name)
+    memory.append(memory_mb)
+    sum_times.append(sum_time * 1000)
+    multiply_times.append(multiply_time * 1000)
+
+    print("Data Type:", np.dtype(dtype).name)
+    print("Array Size:", arr.size)
+    print("Bytes per Element:", arr.itemsize)
+    print("Memory (MB):", round(memory_mb, 2))
+    print("Sum Time (ms):", round(sum_time * 1000, 3))
+    print("Multiply Time (ms):", round(multiply_time * 1000, 3))
+    print("-" * 35)
+
+# 3. Demonstrate integer overflow
+print("\nINTEGER OVERFLOW")
+number = np.array([200]).astype(np.int8)
+print("200 stored as int8:", number[0])
+
+# 4. Demonstrate floating-point precision loss
+print("\nFLOATING-POINT PRECISION")
+a = np.float16(1.0001)
+b = np.float32(1.0001)
+c = np.float64(1.0001)
+
+print("float16:", a)
+print("float32:", b)
+print("float64:", c)
+
+# 5. Plot memory usage
+plt.figure(figsize=(9, 5))
+plt.bar(names, memory)
+plt.title("Memory Usage by Data Type")
+plt.xlabel("Data Type")
+plt.ylabel("Memory (MB)")
+plt.tight_layout()
+plt.show()
+
+# 6. Plot execution time
+x = np.arange(len(names))
+width = 0.35
+
+plt.figure(figsize=(10, 5))
+plt.bar(x - width / 2, sum_times, width, label="Sum")
+plt.bar(x + width / 2, multiply_times, width, label="Multiply")
+plt.xticks(x, names)
+plt.title("Execution Time by Data Type")
+plt.xlabel("Data Type")
+plt.ylabel("Time (milliseconds)")
+plt.legend()
+plt.tight_layout()
+plt.show()
+
+# 7. Final recommendation
+print("\nPROJECT CONCLUSION")
+print("Smaller data types use less memory.")
+print("Larger data types generally offer more precision.")
+print("Choose a data type according to memory and precision needs.")
